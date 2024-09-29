@@ -4,18 +4,18 @@ This project implements a general-purpose approach to summarizing large datasets
 
 ## Features
 
-- **Embedding**: Data entries are transformed into vector embeddings using OpenAI's `text-embedding-3-large` model.
-- **Clustering**: The embeddings are clustered into topics using KMeans.
-- **Retrieval**: The top `N` data points closest to each cluster centroid are retrieved.
-- **Summarization**: GPT-4o-mini generates a summary of the top data points for each topic.
+- **Embedding Generation**: Converts textual data into high-dimensional vector embeddings using OpenAI's `text-embedding-3-large` model.
+- **Clustering**: Uses the KMeans algorithm to cluster data into topics.
+- **Top-N Retrieval**: Retrieves the top `N` most representative data points closest to each cluster centroid.
+- **Summarization**: Combines the top `N` data points from all clusters and generates a single summary using GPT-4o-mini.
 
-## How It Works
+## Workflow
 
-1. **Input Data**: The script reads textual data from either a CSV or a TXT file.
-2. **Embeddings**: The textual data is embedded using the `text-embedding-3-large` model via OpenAI's API.
-3. **Clustering**: KMeans clustering groups the embeddings into topics.
-4. **Retrieval**: For each topic, the closest data points to the cluster centroids are retrieved.
-5. **Summarization**: GPT-4o-mini is used to summarize the top data points for each cluster.
+1. **Data Input**: The pipeline reads textual data from a CSV or TXT file.
+2. **Embedding Generation**: Each text entry is embedded into vector space using OpenAI's `text-embedding-3-large` model.
+3. **Clustering**: KMeans is used to group the embeddings into clusters/topics.
+4. **Top-N Retrieval**: For each cluster, the top `N` data points closest to the centroid are retrieved.
+5. **Summarization**: The retrieved data points from all clusters are concatenated and passed to GPT-4o-mini for summarization in a single request.
 
 ## Requirements
 
