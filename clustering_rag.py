@@ -95,10 +95,10 @@ def get_top_chunks(embeddings, centroids, labels, top_n=3):
         top_chunks.append(closest_indices)
     return top_chunks
 
-# Step 5: Summarize top chunks using GPT-4o-mini
-def summarize_chunks(data, top_chunks, labels):
+# Step 5: Summarize all top chunks combined using GPT-4o-mini
+def summarize_all_chunks(data, top_chunks, labels):
     """
-    Summarize each cluster by selecting the top closest data points and generating a summary.
+    Summarize all top chunks by combining the closest data points from each cluster and generating a single summary.
 
     Args:
         data (list of str): The original data entries.
@@ -106,23 +106,26 @@ def summarize_chunks(data, top_chunks, labels):
         labels (list of int): The cluster labels for each data point.
 
     Returns:
-        summaries (list of str): The generated summaries for each cluster.
+        summary (str): The generated summary for all combined chunks.
     """
-    summaries = []
-    for i, chunk_indices in enumerate(top_chunks):
+    all_text = []
+    for chunk_indices in top_chunks:
         cluster_data = [data[j] for j in range(len(data)) if labels[j] in chunk_indices]
         cluster_text = " ".join(cluster_data)
-        summary = generate_gpt_summary(cluster_text)
-        summaries.append(summary)
-    return summaries
+        all_text.append(cluster_text)
+    
+    combined_text = " ".join(all_text)
+    summary = generate_gpt_summary(combined_text)
+    
+    return summary
 
 # Function to generate summary using GPT-4o-mini
 def generate_gpt_summary(text):
     """
-    Use GPT-4o-mini to summarize a chunk of data.
+    Use GPT-4o-mini to summarize the combined chunks of data.
 
     Args:
-        text (str): The text to summarize.
+        text (str): The combined text to summarize.
 
     Returns:
         summary (str): The generated summary.
@@ -160,7 +163,7 @@ def summarize_data(file_path, file_type='csv', column_name=None, num_clusters=10
         top_n (int): The number of top closest points to retrieve for each cluster.
 
     Returns:
-        summaries (list of str): The summaries for each cluster/topic.
+        summary (str): The combined summary for all clusters/topics.
     """
     # Step 1: Read data from the file
     data = read_data(file_path, file_type, column_name)
@@ -174,25 +177,23 @@ def summarize_data(file_path, file_type='csv', column_name=None, num_clusters=10
     # Step 4: Retrieve the top closest data points to centroids
     top_chunks = get_top_chunks(embeddings, centroids, labels, top_n)
 
-    # Step 5: Summarize the top chunks
-    summaries = summarize_chunks(data, top_chunks, labels)
+    # Step 5: Summarize all top chunks together
+    summary = summarize_all_chunks(data, top_chunks, labels)
 
-    return summaries
+    return summary
 
 # Example usage:
 if __name__ == "__main__":
     # Example usage for CSV file
     file_path = "example_data.csv"
-    summaries = summarize_data(file_path, file_type='csv', column_name='text_column', num_clusters=5, top_n=3)
+    summary = summarize_data(file_path, file_type='csv', column_name='text_column', num_clusters=5, top_n=3)
 
-    # Print the summaries for each cluster
-    for i, summary in enumerate(summaries):
-        print(f"Summary for Topic {i+1}:\n{summary}\n")
+    # Print the final summary
+    print(f"Final Summary:\n{summary}\n")
 
     # Example usage for text file
     file_path = "example_data.txt"
-    summaries = summarize_data(file_path, file_type='txt', num_clusters=5, top_n=3)
+    summary = summarize_data(file_path, file_type='txt', num_clusters=5, top_n=3)
 
-    # Print the summaries for each cluster
-    for i, summary in enumerate(summaries):
-        print(f"Summary for Topic {i+1}:\n{summary}\n")
+    # Print the final summary
+    print(f"Final Summary:\n{summary}\n")
